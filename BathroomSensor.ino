@@ -28,7 +28,7 @@
 */
 
 // Enable debug prints
-//#define MY_DEBUG
+#define MY_DEBUG
 
 // Enable and select radio type attached
 #define MY_RADIO_NRF24
@@ -104,8 +104,7 @@ void presentation()  {
 }
 
 void loop()
-{
-
+{ 
   int lightLevel = (analogRead(LIGHT_SENSOR_ANALOG_PIN)) / 10.23;
   Serial.println(lightLevel);
   if (lightLevel != lastLightLevel) {
@@ -114,13 +113,11 @@ void loop()
   }
   // Read digital motion value
   boolean tripped = digitalRead(DIGITAL_INPUT_SENSOR) == HIGH;
-  Serial.println("Motion Detected");
   Serial.println(tripped);
   send(msg.set(tripped ? "1" : "0")); // Send tripped value to gw
 
-  // Sleep until interrupt comes in on motion sensor. Send update every two minute.
-  sleep(digitalPinToInterrupt(DIGITAL_INPUT_SENSOR), CHANGE, SLEEP_TIME);
-
+   // Sleep until interrupt comes in on motion sensor. Send update every two minute.
+  sleep(digitalPinToInterrupt(DIGITAL_INPUT_SENSOR), RISING, SLEEP_TIME);
   // Force reading sensor, so it works also after sleep()
   dht.readSensor(true);
   // Get temperature from DHT library
