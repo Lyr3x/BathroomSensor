@@ -28,7 +28,7 @@
 */
 
 // Enable debug prints
-#define MY_DEBUG
+//#define MY_DEBUG
 
 // Enable and select radio type attached
 #define MY_RADIO_NRF24
@@ -38,7 +38,7 @@
 #include <MySensors.h>
 #include <DHT.h>
 
-unsigned long SLEEP_TIME = 30000; // Sleep time between reports (in milliseconds) 30 seconds
+unsigned long SLEEP_TIME = 30000; // Sleep time between reports (in milliseconds) 30 seconds (30000)
 // Motion Sensor
 
 #define DIGITAL_INPUT_SENSOR 2   // The digital input you attached your motion sensor.  (Only 2 and 3 generates interrupt!)
@@ -87,7 +87,7 @@ void setup()
   }
   // Sleep for the time of the minimum sampling period to give the sensor time to power up
   // (otherwise, timeout errors might occure for the first reading)
-  sleep(dht.getMinimumSamplingPeriod());
+  //sleep(dht.getMinimumSamplingPeriod());
 }
 
 void presentation()  {
@@ -105,7 +105,7 @@ void presentation()  {
 
 void loop()
 {
-   dht.readSensor(true);
+
   int lightLevel = (analogRead(LIGHT_SENSOR_ANALOG_PIN)) / 10.23;
   Serial.println(lightLevel);
   if (lightLevel != lastLightLevel) {
@@ -114,16 +114,15 @@ void loop()
   }
   // Read digital motion value
   boolean tripped = digitalRead(DIGITAL_INPUT_SENSOR) == HIGH;
-
+  Serial.println("Motion Detected");
   Serial.println(tripped);
   send(msg.set(tripped ? "1" : "0")); // Send tripped value to gw
 
   // Sleep until interrupt comes in on motion sensor. Send update every two minute.
   sleep(digitalPinToInterrupt(DIGITAL_INPUT_SENSOR), CHANGE, SLEEP_TIME);
 
-   // Force reading sensor, so it works also after sleep()
- 
-
+  // Force reading sensor, so it works also after sleep()
+  dht.readSensor(true);
   // Get temperature from DHT library
   float temperature = dht.getTemperature();
   if (isnan(temperature)) {
@@ -139,10 +138,10 @@ void loop()
     temperature += SENSOR_TEMP_OFFSET;
     send(msgTemp.set(temperature, 1));
 
-    #ifdef MY_DEBUG
+#ifdef MY_DEBUG
     Serial.print("T: ");
     Serial.println(temperature);
-    #endif
+#endif
   } else {
     // Increase no update counter if the temperature stayed the same
     nNoUpdatesTemp++;
@@ -159,17 +158,17 @@ void loop()
     nNoUpdatesHum = 0;
     send(msgHum.set(humidity, 1));
 
-    #ifdef MY_DEBUG
+#ifdef MY_DEBUG
     Serial.print("H: ");
     Serial.println(humidity);
-    #endif
+#endif
   } else {
     // Increase no update counter if the humidity stayed the same
     nNoUpdatesHum++;
   }
 
   // Sleep for a while to save energy
-  sleep(UPDATE_INTERVAL); 
+  //sleep(UPDATE_INTERVAL);
 }
 
 
