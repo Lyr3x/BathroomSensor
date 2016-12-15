@@ -32,8 +32,10 @@
 
 // Enable and select radio type attached
 #define MY_RADIO_NRF24
+//#define MY_RF24_ENABLE_ENCRYPTION
+//#define MY_RF24_ENCRYPTKEY 0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10,0x11,0x12,0x13,0x14,0x15,0x16
 //#define MY_RADIO_RFM69
-
+#define MY_NODE 1
 #include <SPI.h>
 #include <MySensors.h>
 #include <DHT.h>
@@ -51,12 +53,12 @@ unsigned long SLEEP_TIME = 30000; // Sleep time between reports (in milliseconds
 #define SENSOR_TEMP_OFFSET 0
 // Sleep time between sensor updates (in milliseconds)
 // Must be >1000ms for DHT22 and >2000ms for DHT11
-static const uint64_t UPDATE_INTERVAL = 60000;
+static const uint64_t UPDATE_INTERVAL = 120000;
 // Force sending an update of the temperature after n sensor reads, so a controller showing the
 // timestamp of the last update doesn't show something like 3 hours in the unlikely case, that
 // the value didn't change since;
 // i.e. the sensor would force sending an update every UPDATE_INTERVAL*FORCE_UPDATE_N_READS [ms]
-static const uint8_t FORCE_UPDATE_N_READS = 10;
+static const uint8_t FORCE_UPDATE_N_READS = 30;
 
 float lastTemp;
 float lastHum;
@@ -117,7 +119,7 @@ void loop()
   send(msg.set(tripped ? "1" : "0")); // Send tripped value to gw
 
    // Sleep until interrupt comes in on motion sensor. Send update every two minute.
-  sleep(digitalPinToInterrupt(DIGITAL_INPUT_SENSOR), RISING, SLEEP_TIME);
+  sleep(digitalPinToInterrupt(DIGITAL_INPUT_SENSOR), CHANGE, SLEEP_TIME);
   // Force reading sensor, so it works also after sleep()
   dht.readSensor(true);
   // Get temperature from DHT library
